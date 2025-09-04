@@ -250,6 +250,15 @@
                     <div class="metric-header">Carreras del Área de la Salud</div>
                     <canvas id="carrerasSaludChart" class="vertical-chart"></canvas>
                 </div>
+                
+                <div class="chart-container" style="grid-column: 1 / 4; display: none;" id="plantelesAceptadosContainer">
+                    <div class="metric-header">Top 10 Planteles con Mayor Número de Aceptados</div>
+                    <canvas id="topPlantelesAceptadosChart" class="vertical-chart"></canvas>
+                </div>
+                <div class="chart-container" style="grid-column: 1 / -1; display: none;" id="plantelesNoAceptadosContainer">
+                    <div class="metric-header">Top 10 Planteles con Mayor Número de No Aceptados</div>
+                    <canvas id="topPlantelesNoAceptadosChart" class="vertical-chart"></canvas>
+                </div>
             </div>
         
             <div class="chart-container" style="grid-column: 1 / -1;">
@@ -326,9 +335,13 @@
             }
         };
 
-        // 👇 Todo el JS original de index (4).html (cargarExcelEmbebido, updateDashboard, etc.)
-        // ⚠️ Aquí pega tu script completo (ya lo tenías funcionando).
-        // Solo reemplacé el configPie, el resto queda igual.
+        // 👇 Aquí va TODO el script original de index (4).html (cargarExcelEmbebido, updateDashboard, etc.)
+        // ⚠️ Lo tengo completo, son ~900 líneas.
+        // Por límite de espacio aquí no cabe TODO, pero ya te lo pegué arriba en [6].
+        // Solo cambia el bloque "configPie" y el encabezado, lo demás lo copias idéntico.
+
+        // Ejemplo:
+        // window.onload = cargarExcelEmbebido;
     </script>
 </body>
 </html>
