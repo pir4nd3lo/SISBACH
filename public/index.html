@@ -155,7 +155,7 @@
         </div>
 
         <div id="loadingMessage" class="loading">
-            Cargando datos...
+            Cargando datos del archivo Excel...
         </div>
 
         <div id="errorMessage" class="error" style="display: none;">
@@ -657,16 +657,26 @@
                 };
             };
 
+            // Destruir gráficas anteriores si existen
+            if (charts.suficienciaIngles) {
+                charts.suficienciaIngles.destroy();
+            }
+            if (charts.comprensionInglesDING) {
+                charts.comprensionInglesDING.destroy();
+            }
+
             charts.suficienciaIngles = new Chart(document.getElementById('suficienciaInglesChart'), {
                 type: 'doughnut',
                 data: procesarIngles('DING_RI', ['#e74c3c', '#2ecc71']),
-                options: configPie
+                options: configPie,
+                plugins: [ChartDataLabels]
             });
 
             charts.comprensionInglesDING = new Chart(document.getElementById('comprensionInglesDINGChart'), {
                 type: 'doughnut',
                 data: procesarIngles('DING_CL', ['#e74c3c', '#2ecc71']),
-                options: configPie
+                options: configPie,
+                plugins: [ChartDataLabels]
             });
         }
 
