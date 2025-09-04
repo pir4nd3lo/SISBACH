@@ -139,7 +139,15 @@
         }
         .retry-button:hover {
             background-color: #2980b9;
+
+            /* 🔧 Ajuste de tamaño para los contenedores de gráficas circulares */
+        #suficienciaInglesChart,
+        #comprensionInglesDINGChart {
+            max-width: 350px;
+            max-height: 350px;
+            }
         }
+        
     </style>
 </head>
 <body>
@@ -812,59 +820,62 @@
         }
 
         // Configuración común para gráficas de tipo pie
-        const configPie = {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        font: { size: 12 },
-                        generateLabels: function(chart) {
-                            const data = chart.data;
-                            if (data.labels.length && data.datasets.length) {
-                                return data.labels.map((label, i) => {
-                                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                    const value = data.datasets[0].data[i];
-                                    const percentage = total === 0 ? '0%' : ((value / total) * 100).toFixed(2) + '%';
-                                    
-                                    return {
-                                        text: `${label}: ${value} (${percentage})`,
-                                        fillStyle: data.datasets[0].backgroundColor[i],
-                                        hidden: false,
-                                        index: i
-                                    };
-                                });
-                            }
-                            return [];
-                        }
+        // 🔧 Configuración común para gráficas de tipo pie (ajustada)
+const configPie = {
+    responsive: true,
+    maintainAspectRatio: false, // 👈 Esto permite que las gráficas usen el tamaño del contenedor
+    plugins: {
+        legend: {
+            position: 'top',
+            labels: {
+                font: { size: 12 },
+                generateLabels: function(chart) {
+                    const data = chart.data;
+                    if (data.labels.length && data.datasets.length) {
+                        return data.labels.map((label, i) => {
+                            const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const value = data.datasets[0].data[i];
+                            const percentage = total === 0 ? '0%' : ((value / total) * 100).toFixed(2) + '%';
+                            
+                            return {
+                                text: `${label}: ${value} (${percentage})`,
+                                fillStyle: data.datasets[0].backgroundColor[i],
+                                hidden: false,
+                                index: i
+                            };
+                        });
                     }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.raw || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = total === 0 ? '0%' : ((value / total) * 100).toFixed(1) + '%';
-                            return `${label}: ${value} (${percentage})`;
-                        }
-                    }
-                },
-                datalabels: {
-                    color: '#ffffff',
-                    font: { 
-                        weight: 'bold', 
-                        size: 14 
-                    },
-                    formatter: (value, context) => {
-                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                        return total === 0 ? '0%' : ((value / total) * 100).toFixed(1) + '%';
-                    },
-                    anchor: 'center',
-                    align: 'middle'
+                    return [];
                 }
             }
-        };
+        },
+        tooltip: {
+            callbacks: {
+                label: function(context) {
+                    const label = context.label || '';
+                    const value = context.raw || 0;
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const percentage = total === 0 ? '0%' : ((value / total) * 100).toFixed(1) + '%';
+                    return `${label}: ${value} (${percentage})`;
+                }
+            }
+        },
+        datalabels: {
+            color: '#ffffff',
+            font: { 
+                weight: 'bold', 
+                size: 14 
+            },
+            formatter: (value, context) => {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                return total === 0 ? '0%' : ((value / total) * 100).toFixed(1) + '%';
+            },
+            anchor: 'center',
+            align: 'middle'
+        }
+    }
+};
+
 
         // Cargar el Excel automáticamente al abrir la página
         window.onload = cargarExcelEmbebido;
