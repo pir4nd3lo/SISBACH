@@ -45,19 +45,73 @@
             margin: 20px 0;
             border: 1px solid #f5c6cb;
         }
+
+        /* Grid principal responsive */
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
+
+        /* Desktop: Grid de 3 columnas */
+        @media (min-width: 769px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            /* Gráficas individuales ocupan 1 columna */
+            .chart-container:not(.full-width):not(.two-columns) {
+                grid-column: span 1;
+            }
+            
+            /* Gráficas especiales que ocupan 2 columnas */
+            .chart-container.two-columns {
+                grid-column: span 2;
+            }
+            
+            /* Gráficas que ocupan toda la fila */
+            .chart-container.full-width {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* Tablet: Grid de 2 columnas */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .chart-container:not(.full-width) {
+                grid-column: span 1;
+            }
+            
+            .chart-container.full-width,
+            .chart-container.two-columns {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* Móvil: Una sola columna */
+        @media (max-width: 480px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                grid-column: 1;
+            }
+        }
+
+        /* Estadísticas generales */
         .icne-stats {
-             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* 👈 más adaptable */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             justify-items: center;
             gap: 1rem;
             padding: 0.5rem;
+            margin-bottom: 20px;
         }
+
         .stat-box {
             text-align: center;
             padding: 1rem;
@@ -65,28 +119,68 @@
             background: white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 220px; /* 👈 limita el ancho en desktop */
+            max-width: 220px;
         }
+
         .stat-value {
             font-size: 24px;
             font-weight: bold;
             color: #2c3e50;
             margin: 10px 0;
         }
+
         .stat-label {
             color: #7f8c8d;
             font-size: 14px;
         }
+
+        /* Contenedores de gráficas */
         .chart-container {
             padding: 15px;
             background-color: #ffffff;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             width: 100%;
-            height: auto;          /* 👈 evita altura fija */
-            min-height: 260px;     /* 👈 asegura espacio mínimo */
-            overflow-x: auto;      /* 👈 si se sale, permite scroll horizontal */
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
         }
+
+        /* Contenedor específico para gráficas de inglés */
+        .ingles-charts-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            min-height: 360px;
+        }
+
+        .pie-wrapper {
+            width: 280px;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .pie-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Etiquetas para gráficas de inglés */
+        .ingles-labels {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        /* Controles del formulario */
         #fileInput {
             margin: 20px 0;
             padding: 12px;
@@ -94,6 +188,7 @@
             border-radius: 8px;
             width: 300px;
         }
+
         select {
             padding: 10px;
             border-radius: 6px;
@@ -101,25 +196,34 @@
             font-size: 14px;
             margin: 0 10px;
         }
+
         .metric-header {
             font-size: 18px;
             color: #34495e;
             margin-bottom: 15px;
             border-bottom: 2px solid #3498db;
             padding-bottom: 8px;
+            flex-shrink: 0;
         }
+
+        /* Gráficas verticales */
         .vertical-chart {
-            height: 100% !important;  /* 👈 deja que el canvas se adapte */
-            min-height: 300px !important;
+            width: 100% !important;
+            min-height: 400px !important;
+            flex: 1;
         }
+
+        /* Tablas responsive */
         .table-responsive {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-        }       
+            flex: 1;
+        }
 
         .table {
             font-size: 14px;
-            white-space: nowrap; /* 👈 evita que las celdas se rompan en varias líneas */
+            white-space: nowrap;
+            width: 100%;
         }
 
         .table th, .table td {
@@ -127,13 +231,16 @@
             text-align: left;
             border-bottom: 1px solid #dee2e6;
         }
+
         .table th {
             background-color: #f8f9fa;
             font-weight: bold;
         }
+
         .table tbody tr:hover {
             background-color: #f1f8ff;
         }
+
         .retry-button {
             background-color: #3498db;
             color: white;
@@ -144,72 +251,115 @@
             font-size: 16px;
             margin: 10px;
         }
+
         .retry-button:hover {
             background-color: #2980b9;
-
-        }    
-
-        .chart-container.ingresChart {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            height: 360px; /* 👈 Altura fija */
         }
 
-                
+        /* Canvas responsive */
+        canvas {
+            max-width: 100% !important;
+            height: auto !important;
+        }
+
+        /* Media queries específicas para móvil */
         @media (max-width: 768px) {
-            .grid-container {
-            grid-template-columns: 1fr; /* 👈 todas las gráficas en una sola columna */
-             }
-            .chart-container {
-             min-height: 250px;
+            body {
+                margin: 10px;
             }
-            #suficienciaInglesChart,
-            #comprensionInglesDINGChart {
-            width: 180px !important;
-            height: 180px !important;
+            
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .stat-value {
+                font-size: 20px;
+            }
+            
+            .stat-label {
+                font-size: 12px;
+            }
+            
+            .chart-container {
+                min-height: 250px;
+                padding: 10px;
+            }
+            
+            .pie-wrapper {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .ingles-charts-container {
+                flex-direction: column;
+                min-height: auto;
+            }
+            
+            .ingles-labels {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .metric-header {
+                font-size: 16px;
             }
         }
 
         @media (max-width: 480px) {
-            h1 { font-size: 18px; }
-            .stat-value { font-size: 16px; }
-            .stat-label { font-size: 11px; }
-            .grid-container { grid-template-columns: 1fr; } /* 👈 todo en una columna */
+            .icne-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .stat-box {
+                max-width: none;
+                padding: 0.75rem;
+            }
+            
+            .stat-value {
+                font-size: 18px;
+            }
+            
+            .stat-label {
+                font-size: 11px;
+            }
+            
+            .pie-wrapper {
+                width: 180px;
+                height: 180px;
+            }
+            
+            select {
+                width: 90%;
+                margin: 5px 0;
+            }
         }
 
-        canvas {
-            max-width: 100% !important;
-            height: auto !important;  /* 👈 escala automático */
+        /* Orientación landscape en móvil */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .icne-stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .ingles-charts-container {
+                flex-direction: row;
+            }
+            
+            .pie-wrapper {
+                width: 220px;
+                height: 220px;
+            }
         }
-        /* 🔧 Contenedor para cada gráfica circular */
-        .pie-wrapper {
-            width: 320px;   /* ancho fijo */
-            height: 320px;  /* alto fijo */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-        }
-
-        /* 🔧 Canvases dentro del wrapper */
-        .pie-wrapper canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        .vertical-chart {
-            width: 100% !important;
-            height: 400px !important;  /* 👈 Ajusta aquí la altura */
-            display: block;
-        }
-
     </style>
 </head>
 <body>
     <div class="container">
-            <!-- 🔧 Encabezado corregido -->
-        <div style="text-align: center; margin-bottom: 20px; background-color: #61828d; padding: 10px;">
+        <!-- Encabezado -->
+        <div style="text-align: center; margin-bottom: 20px; background-color: #61828d; padding: 10px; border-radius: 8px;">
             <img src="https://www.ujat.mx/Content/images/escudo.png" alt="Logo" style="height: 80px; display:block; margin: 0 auto 10px auto;">
             <h1 style="margin: 0; color: white;">Resultados del Proceso de Admisión</h1>
             <h1 style="margin: 0; color: white;">Licenciatura y TSU</h1>
@@ -274,62 +424,65 @@
 
             <!-- Gráficas -->
             <div class="grid-container">
-                <!-- Gráficas de habilidades -->
+                <!-- Gráficas de habilidades individuales -->
                 <div class="chart-container">
                     <div class="metric-header">Comprensión Lectora</div>
                     <canvas id="comprensionChart"></canvas>
                 </div>
+                
                 <div class="chart-container">
                     <div class="metric-header">Redacción Indirecta</div>
                     <canvas id="redaccionChart"></canvas>
                 </div>
+                
                 <div class="chart-container">
                     <div class="metric-header">Pensamiento Matemático</div>
                     <canvas id="matematicasChart"></canvas>
                 </div>
                 
-                <div class="chart-container" style="grid-column: 1 / 3;">
+                <!-- Gráfica de inglés que ocupa 2 columnas en desktop -->
+                <div class="chart-container two-columns">
                     <div class="metric-header">Nivel de Inglés</div>
-                    <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+                    <div class="ingles-charts-container">
                         <div class="pie-wrapper">
                             <canvas id="suficienciaInglesChart"></canvas>
                         </div>
-                    <div class="pie-wrapper">
-                        <canvas id="comprensionInglesDINGChart"></canvas>
+                        <div class="pie-wrapper">
+                            <canvas id="comprensionInglesDINGChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="ingles-labels">
+                        <span>Redacción Indirecta</span>
+                        <span>Comprensión Lectora</span>
                     </div>
                 </div>
 
-
-    <div style="display: flex; justify-content: space-around; margin-top: 10px;">
-        <center>Redacción Indirecta</center>
-        <center>Comprensión Lectora</center>
-    </div>
-</div>
-
                 <!-- Gráfica de Top 10 Carreras ocupando toda la fila -->
-                <div class="chart-container" style="grid-column: 1 / 3;">
+                <div class="chart-container full-width">
                     <div class="metric-header">Top 10 Carreras Más Solicitadas</div>
                     <canvas id="topCarrerasChart" class="vertical-chart"></canvas>
                 </div>
-                <!-- Gráfica de Carreras del Área de la Salud en la fila siguiente -->
-                <div class="chart-container" style="grid-column: 3 / -1;">
+                
+                <!-- Gráfica de Carreras del Área de la Salud -->
+                <div class="chart-container full-width">
                     <div class="metric-header">Carreras del Área de la Salud</div>
                     <canvas id="carrerasSaludChart" class="vertical-chart"></canvas>
                 </div>
                 
-                <!-- Nuevas gráficas de planteles -->
-                <div class="chart-container" style="grid-column: 1 / 4; display: none;" id="plantelesAceptadosContainer">
+                <!-- Gráficas de planteles (se muestran condicionalmente) -->
+                <div class="chart-container full-width" style="display: none;" id="plantelesAceptadosContainer">
                     <div class="metric-header">Top 10 Planteles con Mayor Número de Aceptados</div>
                     <canvas id="topPlantelesAceptadosChart" class="vertical-chart"></canvas>
                 </div>
-                <div class="chart-container" style="grid-column: 1 / -1; display: none;" id="plantelesNoAceptadosContainer">
+                
+                <div class="chart-container full-width" style="display: none;" id="plantelesNoAceptadosContainer">
                     <div class="metric-header">Top 10 Planteles con Mayor Número de No Aceptados</div>
                     <canvas id="topPlantelesNoAceptadosChart" class="vertical-chart"></canvas>
                 </div>
             </div>
         
             <!-- Top 10 mejores puntajes ICNE -->
-            <div class="chart-container" style="grid-column: 1 / -1;">
+            <div class="chart-container full-width" style="margin-top: 20px;">
                 <div class="metric-header">Top 10 Mejores Puntajes ICNE</div>
                 <div class="table-responsive">
                     <table id="topIcneTable" class="table">
@@ -569,13 +722,9 @@
             document.getElementById('plantelesAceptadosContainer').style.display = showPlantelCharts ? 'block' : 'none';
             document.getElementById('plantelesNoAceptadosContainer').style.display = showPlantelCharts ? 'block' : 'none';
 
-            // Mover la tabla de Top 10 ICNE al final
-            const topIcneContainer = document.querySelector('#topIcneTable').closest('.chart-container');
-            topIcneContainer.parentNode.appendChild(topIcneContainer);
-
-            // Destruir gráficas anteriores si están ocultas
+            // Destruir gráficas anteriores
             Object.keys(charts).forEach(key => {
-                if (key !== 'topPlantelesAceptados' && key !== 'topPlantelesNoAceptados' && charts[key]) {
+                if (charts[key]) {
                     charts[key].destroy();
                     charts[key] = null;
                 }
@@ -591,6 +740,7 @@
             const commonOptions = {
                 indexAxis: 'y',
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
                     datalabels: {
@@ -640,8 +790,8 @@
             crearGraficasIngles(filteredData);
 
             // Procesar y mostrar gráficas de carreras
-            actualizarGraficaCarreras('topCarrerasChart', filteredData);
-            actualizarGraficaCarreras('carrerasSaludChart', filteredData, [
+            actualizarGraficaCarreras('topCarreras', filteredData);
+            actualizarGraficaCarreras('carrerasSalud', filteredData, [
                 'MÉDICO CIRUJANO',
                 'CIRUJANO DENTISTA',
                 'LICENCIADO EN ENFERMERÍA',
@@ -652,6 +802,7 @@
             if (showPlantelCharts) {
                 const dataAceptados = procesarPlanteles(filteredData, 'aceptados');
                 crearGraficaPlanteles(
+                    'topPlantelesAceptados',
                     'topPlantelesAceptadosChart',
                     dataAceptados,
                     '#27ae60',
@@ -660,6 +811,7 @@
 
                 const dataNoAceptados = procesarPlanteles(filteredData, 'noAceptados');
                 crearGraficaPlanteles(
+                    'topPlantelesNoAceptados',
                     'topPlantelesNoAceptadosChart',
                     dataNoAceptados,
                     '#e74c3c',
@@ -747,21 +899,25 @@
             });
         }
 
-        function actualizarGraficaCarreras(chartId, filteredData, filtroCarreras = null) {
+        function actualizarGraficaCarreras(chartKey, filteredData, filtroCarreras = null) {
+            const chartId = chartKey + 'Chart';
             const ctx = document.getElementById(chartId);
             const data = procesarCarreras(filteredData, filtroCarreras);
             
-            if (charts[chartId]) {
-                charts[chartId].destroy();
+            if (charts[chartKey]) {
+                charts[chartKey].destroy();
             }
             
-            charts[chartId] = new Chart(ctx, {
+            charts[chartKey] = new Chart(ctx, {
                 type: 'bar',
                 data: data,
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true } },
+                    scales: { 
+                        x: { stacked: false }, 
+                        y: { stacked: false, beginAtZero: true } 
+                    },
                     plugins: {
                         legend: { position: 'top' },
                         datalabels: {
@@ -799,12 +955,12 @@
         }
 
         // Función auxiliar para crear gráficas de planteles
-        function crearGraficaPlanteles(canvasId, data, color, label) {
+        function crearGraficaPlanteles(chartKey, canvasId, data, color, label) {
             const ctx = document.getElementById(canvasId);
             
-            if (charts[canvasId]) charts[canvasId].destroy();
+            if (charts[chartKey]) charts[chartKey].destroy();
             
-            charts[canvasId] = new Chart(ctx, {
+            charts[chartKey] = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: data.map(d => d.nombre),
@@ -881,62 +1037,60 @@
         }
 
         // Configuración común para gráficas de tipo pie
-        // 🔧 Configuración común para gráficas de tipo pie (ajustada)
-const configPie = {
-    responsive: true,
-    maintainAspectRatio: false, // 👈 Esto permite que las gráficas usen el tamaño del contenedor
-    plugins: {
-        legend: {
-            position: 'top',
-            labels: {
-                font: { size: 12 },
-                generateLabels: function(chart) {
-                    const data = chart.data;
-                    if (data.labels.length && data.datasets.length) {
-                        return data.labels.map((label, i) => {
-                            const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
-                            const value = data.datasets[0].data[i];
-                            const percentage = total === 0 ? '0%' : ((value / total) * 100).toFixed(2) + '%';
-                            
-                            return {
-                                text: `${label}: ${value} (${percentage})`,
-                                fillStyle: data.datasets[0].backgroundColor[i],
-                                hidden: false,
-                                index: i
-                            };
-                        });
+        const configPie = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: { size: 12 },
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    const value = data.datasets[0].data[i];
+                                    const percentage = total === 0 ? '0%' : ((value / total) * 100).toFixed(2) + '%';
+                                    
+                                    return {
+                                        text: `${label}: ${value} (${percentage})`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
                     }
-                    return [];
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total === 0 ? '0%' : ((value / total) * 100).toFixed(1) + '%';
+                            return `${label}: ${value} (${percentage})`;
+                        }
+                    }
+                },
+                datalabels: {
+                    color: '#ffffff',
+                    font: { 
+                        weight: 'bold', 
+                        size: 14 
+                    },
+                    formatter: (value, context) => {
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        return total === 0 ? '0%' : ((value / total) * 100).toFixed(1) + '%';
+                    },
+                    anchor: 'center',
+                    align: 'middle'
                 }
             }
-        },
-        tooltip: {
-            callbacks: {
-                label: function(context) {
-                    const label = context.label || '';
-                    const value = context.raw || 0;
-                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                    const percentage = total === 0 ? '0%' : ((value / total) * 100).toFixed(1) + '%';
-                    return `${label}: ${value} (${percentage})`;
-                }
-            }
-        },
-        datalabels: {
-            color: '#ffffff',
-            font: { 
-                weight: 'bold', 
-                size: 14 
-            },
-            formatter: (value, context) => {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                return total === 0 ? '0%' : ((value / total) * 100).toFixed(1) + '%';
-            },
-            anchor: 'center',
-            align: 'middle'
-        }
-    }
-};
-
+        };
 
         // Cargar el Excel automáticamente al abrir la página
         window.onload = cargarExcelEmbebido;
