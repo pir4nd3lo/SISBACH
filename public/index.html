@@ -1,1 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Ejecutivo - Colegio de Bachilleres</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 25px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .filters {
+            margin: 25px 0;
+            text-align: center;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .icne-stats {
+            display: Flex;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            justify-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+        .stat-box {
+            text-align: center;
+            padding: 1.2rem;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 250px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .chart-container {
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        #fileInput {
+            margin: 20px 0;
+            padding: 12px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            width: 300px;
+        }
+        select {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            margin: 0 10px;
+        }
+        .metric-header {
+            font-size: 18px;
+            color: #34495e;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+        .vertical-chart {
+            height: 400px !important;
+        }
+
+        .table-responsive {
+        overflow-x: auto;   
+        }       
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        .table th, .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .table tbody tr:hover {
+            background-color: #f1f8ff;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Encabezado -->
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px; background-color: #61828d;">
+            <img src="https://www.ujat.mx/Content/images/escudo.png" alt="Logo" style="height: 80px; margin-right: 20px;"></div>
+            <div style="text-align: center;">
+                <h1 style="margin: 0;">Resultados del Proceso de Admisión</h1>
+                <h1 style="margin: 0;">Licenciatura y TSU</h1>
+                <h1 style="margin: 0;">Dashboard</h1>
+            </div>
+        
+
+        <!-- Selector de archivo -->
+        <center>
+            <input type="file" id="fileInput" accept=".xlsx, .xls" onchange="handleFile(event)">
+        </center>
+
+        <!-- Filtros -->
+        <div class="filters">
+            <select id="sistemaSelect" onchange="updatePlantelOptions(); updateDashboard()" disabled>
+                <option value="TODOS">Todos los Sistemas</option>
+            </select>
+            <select id="plantelSelect" onchange="updateDashboard()" disabled>
+                <option value="TODOS">Todos los Planteles</option>
+            </select>
+        </div>
+
+        <!-- Estadísticas generales -->
+        <div class="icne-stats">
+            <div class="stat-box">
+                <div class="stat-label">MÁXIMO DE ICNE</div>
+                <div class="stat-value" id="maxIcne">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">MÍNIMO DE ICNE</div>
+                <div class="stat-value" id="minIcne">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">PROMEDIO DE ICNE</div>
+                <div class="stat-value" id="avgIcne">-</div>
+            </div>
+        </div>
+            
+        <div class="icne-stats">    
+            <div class="stat-box">
+                <div class="stat-label">TOTAL ASPIRANTES</div>
+                <div class="stat-value" id="totalAspirantes">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">ACEPTADOS</div>
+                <div class="stat-value" id="totalAceptados">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">NO ACEPTADOS</div>
+                <div class="stat-value" id="totalNoAceptados">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">% ACEPTACIÓN</div>
+                <div class="stat-value" id="porcentajeAceptacion">-</div>
+            </div>
+        </div>
+
+        <!-- Gráficas -->
+        <div class="grid-container">
+            <!-- Gráficas de habilidades -->
+            <div class="chart-container">
+                <div class="metric-header">Comprensión Lectora</div>
+                <canvas id="comprensionChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <div class="metric-header">Redacción Indirecta</div>
+                <canvas id="redaccionChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <div class="metric-header">Pensamiento Matemático</div>
+                <canvas id="matematicasChart"></canvas>
+            </div>
+            <div class="chart-container" style="grid-column: 1 / 3;">
+             <div class="metric-header">Nivel de Inglés</div>
+                <div style="display: flex; justify-content: space-around;">
+                    <div>
+                        <canvas id="suficienciaInglesChart" width="300" height="300"></canvas>
+                        <center>Redacción Indirecta</center>
+                    </div>
+                    <div>
+                        <canvas id="comprensionInglesDINGChart" width="300" height="300"></canvas>
+                        <center>Comprensión Lectora</center>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gráfica de Top 10 Carreras ocupando toda la fila -->
+            <div class="chart-container" style="grid-column: 1 / 3;">
+                 <div class="metric-header">Top 10 Carreras Más Solicitadas</div>
+                 <canvas id="topCarrerasChart" class="vertical-chart"></canvas>
+            </div>
+           <!-- Gráfica de Carreras del Área de la Salud en la fila siguiente -->
+            <div class="chart-container" style="grid-column: 3 / -1;">
+                    <div class="metric-header">Carreras del Área de la Salud</div>
+                     <canvas id="carrerasSaludChart" class="vertical-chart"></canvas>
+            </div>
+           
+            <!-- Nuevas gráficas de planteles -->
+            <div class="chart-container" style="grid-column: 1 / 4; display: none;" id="plantelesAceptadosContainer">
+                <div class="metric-header">Top 10 Planteles con Mayor Número de Aceptados</div>
+                <canvas id="topPlantelesAceptadosChart" class="vertical-chart"></canvas>
+            </div>
+            <div class="chart-container" style="grid-column: 1 / -1; display: none;" id="plantelesNoAceptadosContainer">
+                <div class="metric-header">Top 10 Planteles con Mayor Número de No Aceptados</div>
+                <canvas id="topPlantelesNoAceptadosChart" class="vertical-chart"></canvas>
+            </div>
+
+        </div>
+    
+        <!-- Top 10 mejores puntajes ICNE -->
+    <div class="chart-container" style="grid-column: 1 / -1;">
+        <div class="metric-header">Top 10 Mejores Puntajes ICNE</div>
+        <div class="table-responsive">
+            <table id="topIcneTable" class="table">
+                <thead>
+                    <tr>
+                        <th>Ubicación</th>
+                        <th>Carrera</th>
+                        <th>Nombre</th>
+                        <th>Apellido Paterno</th>
+                        <th>Apellido Materno</th>
+                        <th>ICNE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <!-- Los datos se llenarán dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        let datos = [];
+        let charts = {
+            comprension: null,
+            redaccion: null,
+            matematicas: null,
+            inglesComprension: null,
+            inglesRedaccion: null,
+            suficienciaIngles: null,
+            comprensionInglesDING: null,
+            topCarreras: null,
+            carrerasSalud: null,
+            // ... otras gráficas
+            topPlantelesAceptados: null,
+            topPlantelesNoAceptados: null
+        };
+
+        function handleFile(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
+                
+                // Procesar datos
+                const headers = jsonData[0];
+                datos = jsonData.slice(1).map(row => {
+                    const obj = {};
+                    headers.forEach((header, index) => {
+                        obj[header] = row[index];
+                    });
+                    return obj;
+                });
+                
+                // Configurar selectores de filtros
+                const sistemaSelect = document.getElementById('sistemaSelect');
+                const plantelSelect = document.getElementById('plantelSelect');
+                sistemaSelect.disabled = false;
+                plantelSelect.disabled = false;
+
+                // Limpiar opciones anteriores
+                sistemaSelect.querySelectorAll('option:not(:first-child)').forEach(option => option.remove());
+                plantelSelect.querySelectorAll('option:not(:first-child)').forEach(option => option.remove());
+
+                // Poblar opciones para Sistema
+                const sistemas = [...new Set(datos.map(item => item['SISTEMA']))];
+                sistemas.forEach(sis => {
+                    const option = document.createElement('option');
+                    option.value = sis;
+                    option.textContent = sis;
+                    sistemaSelect.appendChild(option);
+                });
+
+                updatePlantelOptions();
+                updateDashboard();
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updatePlantelOptions() {
+            const sistemaSelect = document.getElementById('sistemaSelect');
+            const plantelSelect = document.getElementById('plantelSelect');
+            const selectedSistema = sistemaSelect.value;
+            
+            plantelSelect.querySelectorAll('option:not(:first-child)').forEach(option => option.remove());
+            
+            let planteles = [];
+            if (selectedSistema === "TODOS") {
+                planteles = [...new Set(datos.map(item => item['PLANTEL']))];
+            } else {
+                planteles = [...new Set(datos.filter(item => item['SISTEMA'] === selectedSistema)
+                                            .map(item => item['PLANTEL']))];
+            }
+            
+            planteles.forEach(plant => {
+                const option = document.createElement('option');
+                option.value = plant;
+                option.textContent = plant;
+                plantelSelect.appendChild(option);
+            });
+            plantelSelect.value = "TODOS";
+        }
+        function actualizarTablaTopIcne(filteredData) {
+            const tableBody = document.querySelector('#topIcneTable tbody');
+            
+            if (!tableBody) return; // Protección contra errores
+            
+            tableBody.innerHTML = '';
+
+            // Depuración: muestra las claves disponibles en el primer elemento
+             if (filteredData.length > 0) {
+            console.log("Campos disponibles:", Object.keys(filteredData[0]));
+                }
+
+    
+             // Ordenar datos por ICNE (de mayor a menor)
+            const topData = [...filteredData]
+                .filter(item => item.ICNE) // Filtra valores nulos o undefined
+                .sort((a, b) => parseFloat(b.ICNE || 0) - parseFloat(a.ICNE || 0))
+                .slice(0, 10);
+    
+             // Llenar la tabla
+            topData.forEach(item => {
+            
+                const ubicacion = `${item.SISTEMA || ''} - ${item.PLANTEL || ''}`;
+            
+                const row = document.createElement('tr');
+            
+            row.innerHTML = `
+            <td>${ubicacion}</td>
+            <td>${item.CARRERA || '-'}</td>
+            <td>${item.NOMBRE || '-'}</td>
+            <td>${item.PRIM_APE || '-'}</td>
+            <td>${item.SEGU_APE || '-'}</td>
+            <td><strong>${parseFloat(item.ICNE || 0).toFixed(0)}</strong></td>
+            `;
+         tableBody.appendChild(row);
+        });
+        }
+        
+        function updateDashboard() {
+            if (datos.length === 0) return;
+            
+            const selectedSistema = document.getElementById('sistemaSelect').value;
+            const selectedPlantel = document.getElementById('plantelSelect').value;
+            const filteredData = datos.filter(item => {
+                let condition = true;
+                if (selectedSistema !== 'TODOS') condition = condition && (item['SISTEMA'] === selectedSistema);
+                if (selectedPlantel !== 'TODOS') condition = condition && (item['PLANTEL'] === selectedPlantel);
+                return condition;
+            });
+
+            // Actualizar estadísticas generales
+            const totalAspirantes = filteredData.length;
+            const totalAceptados = filteredData.filter(item => item.DICTAMEN?.toUpperCase() === 'ACEPTADO').length;
+            const totalNoAceptados = totalAspirantes - totalAceptados;
+            const porcentajeAceptacion = totalAspirantes > 0 ? ((totalAceptados / totalAspirantes) * 100).toFixed(1) : 0;
+
+            document.getElementById('totalAspirantes').textContent = totalAspirantes;
+            document.getElementById('totalAceptados').textContent = totalAceptados;
+            document.getElementById('totalNoAceptados').textContent = totalNoAceptados;
+            document.getElementById('porcentajeAceptacion').textContent = porcentajeAceptacion + '%';
+
+            // Actualizar estadísticas ICNE
+            const icneValues = filteredData.map(item => parseFloat(item.ICNE) || 0);
+            const maxIcne = icneValues.length ? Math.max(...icneValues).toFixed(0) : '-';
+            const minIcne = icneValues.length ? Math.min(...icneValues).toFixed(0) : '-';
+            const avgIcne = icneValues.length ? (icneValues.reduce((a, b) => a + b, 0) / icneValues.length).toFixed(0) : '-';
+        
+            document.getElementById('maxIcne').textContent = maxIcne;
+            document.getElementById('minIcne').textContent = minIcne;
+            document.getElementById('avgIcne').textContent = avgIcne;
+
+            // Mostrar/ocultar contenedores según filtros
+            const showPlantelCharts = selectedSistema !== 'TODOS' && selectedPlantel === 'TODOS';
+            
+            document.getElementById('plantelesAceptadosContainer').style.display = showPlantelCharts ? 'block' : 'none';
+            document.getElementById('plantelesNoAceptadosContainer').style.display = showPlantelCharts ? 'block' : 'none';
+
+            // Mover la tabla de Top 10 ICNE al final
+            const topIcneContainer = document.querySelector('#topIcneTable').closest('.chart-container');
+            topIcneContainer.parentNode.appendChild(topIcneContainer);
+
+            // Destruir gráficas anteriores si están ocultas
+            Object.keys(charts).forEach(key => {
+            if (key !== 'topPlantelesAceptados' && key !== 'topPlantelesNoAceptados' && charts[key]) {
+                charts[key].destroy();
+                charts[key] = null;
+            }
+        });
+
+            // Función para calcular promedios corregida
+            const promedio = (key) => {
+                const total = filteredData.reduce((sum, item) => sum + (parseFloat(item[key]) || 0), 0);
+                return filteredData.length ? (total / filteredData.length).toFixed(2) : 0;
+            };
+
+            // Configuración común para gráficas de habilidades
+            const commonOptions = {
+                indexAxis: 'y',
+                responsive: true,
+                plugins: {
+                    legend: { display: 'top' },
+                    datalabels: {
+                        anchor: 'center',
+                        align: 'center',
+                        color: '#fff',
+                        font: { weight: 'bold' },
+                        formatter: value => value
+                    }
+                },
+                scales: { x: { max: 100, beginAtZero: true } }
+            };
+
+            // Crear gráficas de habilidades
+            charts.comprension = crearGraficaHabilidad(
+                'comprensionChart',
+                ['Ámbito Estudio', 'Ámbito de Participación Social', 'Ámbito Literario'],
+                ['PCLE_AE', 'PCLE_APS', 'PCLE_AL'],
+                ['#3498db', '#2ecc71', '#9b59b6'],
+                promedio,
+                commonOptions
+            );
+           
+            charts.redaccion = crearGraficaHabilidad(
+                'redaccionChart',
+                ['Ámbito Estudio', 'Ámbito Participación Social'],
+                ['PRIN_ES', 'PRIN_PS'],
+                ['#e67e22', '#f1c40f'],
+                promedio,
+                commonOptions
+            );
+
+            charts.matematicas = crearGraficaHabilidad(
+                'matematicasChart',
+                ['Comprensión Matemática', 'Matematización'],
+                ['PPMA_CM', 'PPMA_MA'],
+                ['#e74c3c', '#1abc9c'],
+                promedio,
+                commonOptions
+            );
+
+            // Crear gráficas de inglés
+            crearGraficasIngles(filteredData);
+
+            // Procesar y mostrar gráficas de carreras
+            actualizarGraficaCarreras('topCarrerasChart', filteredData);
+            actualizarGraficaCarreras('carrerasSaludChart', filteredData, [
+                'MÉDICO CIRUJANO',
+                'CIRUJANO DENTISTA',
+                'LICENCIADO EN ENFERMERÍA',
+                'LICENCIADO EN PSICOLOGÍA'
+            ]);
+        // Crear gráficas de planteles solo si se cumple la condición
+            if (showPlantelCharts) {
+        // Gráfica de aceptados
+            const dataAceptados = procesarPlanteles(filteredData, 'aceptados');
+            crearGraficaPlanteles(
+            'topPlantelesAceptadosChart',
+            dataAceptados,
+            '#27ae60',
+            'Aceptados'
+        );
+
+    // Gráfica de no aceptados
+    const dataNoAceptados = procesarPlanteles(filteredData, 'noAceptados');
+    crearGraficaPlanteles(
+        'topPlantelesNoAceptadosChart',
+        dataNoAceptados,
+        '#e74c3c',
+        'No Aceptados'
+    );
+}
+
+// Función auxiliar para crear gráficas de planteles
+function crearGraficaPlanteles(canvasId, data, color, label) {
+    const ctx = document.getElementById(canvasId);
+    
+    if (charts[canvasId]) charts[canvasId].destroy();
+    
+    charts[canvasId] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.nombre),
+            datasets: [{
+                label: label,
+                data: data.map(d => d.cantidad),
+                backgroundColor: color,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'end',
+                    color: '#000',
+                    font: { weight: 'bold' },
+                    formatter: value => value
+                }
+            },
+            scales: {
+                x: { beginAtZero: true },
+                y: { ticks: { autoSkip: false } }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+}
+        actualizarTablaTopIcne(filteredData);
+        }
+
+        // Función para crear gráficas de habilidades
+        function crearGraficaHabilidad(canvasId, labels, keys, colores, promedio, commonOptions) {
+            return new Chart(document.getElementById(canvasId), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Porcentaje',
+                        data: keys.map(k => promedio(k)),
+                        backgroundColor: colores,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                legend: { 
+                    display: false  // Esta línea oculta las leyendas
+                },
+                datalabels: {
+                    anchor: 'center',    // Etiqueta al inicio de la barra
+                    align: 'center',     // Alineación izquierda
+                    color: '#ffffff',   // Color blanco
+                    font: {
+                        weight: 'bold',
+                        size: 14        // Tamaño aumentado
+                    },
+                    formatter: value => `${value}%`,  // Agrega símbolo %
+                    offset: 10         // Margen desde el borde
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+                
+            });
+        }
+            
+        function crearGraficasIngles(data) {
+            // Gráficas de inglés
+            const procesarIngles = (campo, colores) => {
+                const counts = data.reduce((acc, item) => {
+                    const valor = parseInt(item[campo]) || 0;
+                    acc[valor === 2 ? 1 : 0]++;
+                    return acc;
+                }, [0, 0]);
+                
+                return {
+                    labels: ['No Satisfactorio', 'Satisfactorio'],
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: colores
+                    }]
+                };
+            };
+
+            charts.suficienciaIngles = new Chart(document.getElementById('suficienciaInglesChart'), {
+                type: 'doughnut',
+                data: procesarIngles('DING_RI', ['#e74c3c', '#2ecc71']),
+                options: configPie
+            });
+
+            charts.comprensionInglesDING = new Chart(document.getElementById('comprensionInglesDINGChart'), {
+                type: 'doughnut',
+                data: procesarIngles('DING_CL', ['#e74c3c', '#2ecc71']),
+                options: configPie
+            });
+        }
+
+        function actualizarGraficaCarreras(chartId, filteredData, filtroCarreras = null) {
+            const ctx = document.getElementById(chartId);
+            const data = procesarCarreras(filteredData, filtroCarreras);
+             // Destruimos la gráfica previa si existe
+             if (charts[chartId]) {
+                 charts[chartId].destroy();
+                }
+            charts[chartId] = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true } },
+                    plugins: {
+                        legend: { position: 'top' },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#000',
+                            font: {
+                            weight: 'bold'
+                                  },
+                            formatter: value => value > 0 ? value : ''
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+        
+        function procesarPlanteles(filteredData, tipo) {
+            const plantelData = filteredData.reduce((acc, item) => {
+            const plantel = item.PLANTEL;
+            if (!plantel) return acc;
+        
+            if (!acc[plantel]) acc[plantel] = 0;
+        
+            if ((tipo === 'aceptados' && item.DICTAMEN?.toUpperCase() === 'ACEPTADO') ||
+            (tipo === 'noAceptados' && item.DICTAMEN?.toUpperCase() !== 'ACEPTADO')) {
+            acc[plantel]++;
+        }
+        
+        return acc;
+    }, {});
+
+    return Object.entries(plantelData)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 10)
+        .map(([nombre, cantidad]) => ({ nombre, cantidad }));
+}
+
+
+
+        // Función modificada para recibir filteredData como parámetro
+        function procesarCarreras(filteredData, filtro = null) {
+            const carrerasData = filteredData.reduce((acc, item) => {
+                const carrera = item.CARRERA?.toUpperCase();
+                if (!carrera) return acc;
+                
+                if (!acc[carrera]) acc[carrera] = { aceptados: 0, noAceptados: 0 };
+                
+                item.DICTAMEN?.toUpperCase() === 'ACEPTADO' 
+                    ? acc[carrera].aceptados++ 
+                    : acc[carrera].noAceptados++;
+                
+                return acc;
+            }, {});
+
+            let carreras = Object.entries(carrerasData);
+            
+            if (filtro) {
+                carreras = carreras.filter(([nombre]) => filtro.includes(nombre));
+            } else {
+                carreras = carreras.sort((a, b) => 
+                    (b[1].aceptados + b[1].noAceptados) - (a[1].aceptados + a[1].noAceptados)
+                ).slice(0, 10);
+            }
+
+            return {
+                labels: carreras.map(([nombre]) => nombre),
+                datasets: [
+                    {
+                        label: 'Aceptados',
+                        data: carreras.map(([, datos]) => datos.aceptados),
+                        backgroundColor: '#27ae60'
+                    },
+                    {
+                        label: 'No Aceptados',
+                        data: carreras.map(([, datos]) => datos.noAceptados),
+                        backgroundColor: '#e74c3c'
+                    }
+                ]
+            };
+        }
+
+        // Configuración común para gráficas de tipo pie
+        // Dentro de la sección de scripts, modifica la constante configPie:
+const configPie = {
+    responsive: true,
+    plugins: {
+        legend: {
+            position: 'top',
+            labels: {
+                font: { size: 12 },
+                generateLabels: function(chart) {
+                    const data = chart.data;
+                    if (data.labels.length && data.datasets.length) {
+                        return data.labels.map((label, i) => {
+                            const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const value = data.datasets[0].data[i];
+                            const percentage = total === 0 ? '0%' : ((value / total) * 100).toFixed(2) + '%';
+                            
+                            return {
+                                text: `${label}: ${value} (${percentage})`,
+                                fillStyle: data.datasets[0].backgroundColor[i],
+                                hidden: false,
+                                index: i
+                            };
+                        });
+                    }
+                    return [];
+                }
+            }
+        },
+        tooltip: {
+            callbacks: {
+                label: function(context) {
+                    const label = context.label || '';
+                    const value = context.raw || 0;
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const percentage = total === 0 ? '0%' : ((value / total) * 100).toFixed(1) + '%';
+                    return `${label}: ${value} (${percentage})`;
+                }
+            }
+        },
+        datalabels: {
+            color: '#ffffff',
+            font: { 
+                weight: 'bold', 
+                size: 14 
+            },
+            formatter: (value, context) => {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                return total === 0 ? '0%' : ((value / total) * 100).toFixed(1) + '%';
+            },
+            anchor: 'center',
+            align: 'middle'
+        }
+    }
+};
+    </script>
+</body>
+</html>
 
