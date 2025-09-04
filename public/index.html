@@ -260,9 +260,11 @@
         // Cargar el Excel automáticamente al abrir la página
         async function cargarExcelEmbebido() {
             try {
-                const response = await fetch(excelUrl);
-                if (!response.ok) throw new Error("No se pudo cargar el archivo Excel");
-                const arrayBuffer = await response.arrayBuffer();
+                const response = await fetch();
+                if (!response.ok) 
+                const errorData = await response.json();    
+                throw new Error("No se pudo cargar el archivo Excel");
+                const arrayBuffer = await response.arrayBuffer('/api/fetch-excel');
         
                 const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
