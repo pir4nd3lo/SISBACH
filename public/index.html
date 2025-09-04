@@ -182,7 +182,21 @@
             max-width: 100% !important;
             height: auto !important;  /* 👈 escala automático */
         }
+        /* 🔧 Contenedor para cada gráfica circular */
+        .pie-wrapper {
+            width: 320px;   /* ancho fijo */
+            height: 320px;  /* alto fijo */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
 
+        /* 🔧 Canvases dentro del wrapper */
+        .pie-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
     </style>
 </head>
 <body>
@@ -266,20 +280,30 @@
                     <div class="metric-header">Pensamiento Matemático</div>
                     <canvas id="matematicasChart"></canvas>
                 </div>
+                
                 <div class="chart-container" style="grid-column: 1 / 3;">
                     <div class="metric-header">Nivel de Inglés</div>
-                    <div style="display: flex; justify-content: space-around;">
-                        <div>
-                            <canvas id="suficienciaInglesChart" width="300" height="300"></canvas>
-                            <center>Redacción Indirecta</center>
+                    <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+                        <div class="pie-wrapper">
+                            <canvas id="suficienciaInglesChart"></canvas>
                         </div>
-                        <div>
-                            <canvas id="comprensionInglesDINGChart" width="300" height="300"></canvas>
-                            <center>Comprensión Lectora</center>
-                        </div>
+                    <div class="pie-wrapper">
+                        <canvas id="comprensionInglesDINGChart"></canvas>
                     </div>
                 </div>
+
                 
+    <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+        <center>Redacción Indirecta</center>
+        <center>Comprensión Lectora</center>
+    </div>
+</div>
+
+                
+                
+                
+
+
                 <!-- Gráfica de Top 10 Carreras ocupando toda la fila -->
                 <div class="chart-container" style="grid-column: 1 / 3;">
                     <div class="metric-header">Top 10 Carreras Más Solicitadas</div>
@@ -917,4 +941,5 @@ const configPie = {
     </script>
 </body>
 </html>
+
 
