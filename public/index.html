@@ -119,7 +119,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Encabezado -->
         <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px; background-color: #61828d;">
             <img src="https://www.ujat.mx/Content/images/escudo.png" alt="Logo" style="height: 80px; margin-right: 20px;"></div>
             <div style="text-align: center;">
@@ -129,12 +128,6 @@
             </div>
         
 
-        <!-- Selector de archivo -->
-        <center>
-            <input type="file" id="fileInput" accept=".xlsx, .xls" onchange="handleFile(event)">
-        </center>
-
-        <!-- Filtros -->
         <div class="filters">
             <select id="sistemaSelect" onchange="updatePlantelOptions(); updateDashboard()" disabled>
                 <option value="TODOS">Todos los Sistemas</option>
@@ -144,7 +137,6 @@
             </select>
         </div>
 
-        <!-- Estadísticas generales -->
         <div class="icne-stats">
             <div class="stat-box">
                 <div class="stat-label">MÁXIMO DE ICNE</div>
@@ -179,9 +171,7 @@
             </div>
         </div>
 
-        <!-- Gráficas -->
         <div class="grid-container">
-            <!-- Gráficas de habilidades -->
             <div class="chart-container">
                 <div class="metric-header">Comprensión Lectora</div>
                 <canvas id="comprensionChart"></canvas>
@@ -208,18 +198,15 @@
                 </div>
             </div>
             
-            <!-- Gráfica de Top 10 Carreras ocupando toda la fila -->
             <div class="chart-container" style="grid-column: 1 / 3;">
                  <div class="metric-header">Top 10 Carreras Más Solicitadas</div>
                  <canvas id="topCarrerasChart" class="vertical-chart"></canvas>
             </div>
-           <!-- Gráfica de Carreras del Área de la Salud en la fila siguiente -->
-            <div class="chart-container" style="grid-column: 3 / -1;">
+           <div class="chart-container" style="grid-column: 3 / -1;">
                     <div class="metric-header">Carreras del Área de la Salud</div>
                      <canvas id="carrerasSaludChart" class="vertical-chart"></canvas>
             </div>
            
-            <!-- Nuevas gráficas de planteles -->
             <div class="chart-container" style="grid-column: 1 / 4; display: none;" id="plantelesAceptadosContainer">
                 <div class="metric-header">Top 10 Planteles con Mayor Número de Aceptados</div>
                 <canvas id="topPlantelesAceptadosChart" class="vertical-chart"></canvas>
@@ -231,8 +218,7 @@
 
         </div>
     
-        <!-- Top 10 mejores puntajes ICNE -->
-    <div class="chart-container" style="grid-column: 1 / -1;">
+        <div class="chart-container" style="grid-column: 1 / -1;">
         <div class="metric-header">Top 10 Mejores Puntajes ICNE</div>
         <div class="table-responsive">
             <table id="topIcneTable" class="table">
@@ -247,7 +233,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                <!-- Los datos se llenarán dinámicamente -->
                 </tbody>
             </table>
         </div>
@@ -268,18 +253,22 @@
             topPlantelesAceptados: null,
             topPlantelesNoAceptados: null
         };
-
-        function handleFile(event) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
+        
+        // URL RAW del archivo Excel embebido
+        const excelUrl = "https://github.com/pir4nd3lo/SISBACH/raw/main/TABLA_C_LAGRGO.xlsx";
+        
+        // Cargar el Excel automáticamente al abrir la página
+        async function cargarExcelEmbebido() {
+            try {
+                const response = await fetch(excelUrl);
+                if (!response.ok) throw new Error("No se pudo cargar el archivo Excel");
+                const arrayBuffer = await response.arrayBuffer();
+        
+                const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-                
-                // Procesar datos
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+        
+                // Procesar datos igual que antes
                 const headers = jsonData[0];
                 datos = jsonData.slice(1).map(row => {
                     const obj = {};
@@ -288,17 +277,16 @@
                     });
                     return obj;
                 });
-                
-                // Configurar selectores de filtros
+        
+                // Habilita filtros y actualiza dashboard
+                document.getElementById('sistemaSelect').disabled = false;
+                document.getElementById('plantelSelect').disabled = false;
+        
                 const sistemaSelect = document.getElementById('sistemaSelect');
                 const plantelSelect = document.getElementById('plantelSelect');
-                sistemaSelect.disabled = false;
-                plantelSelect.disabled = false;
-
-                // Limpiar opciones anteriores
                 sistemaSelect.querySelectorAll('option:not(:first-child)').forEach(option => option.remove());
                 plantelSelect.querySelectorAll('option:not(:first-child)').forEach(option => option.remove());
-
+        
                 // Poblar opciones para Sistema
                 const sistemas = [...new Set(datos.map(item => item['SISTEMA']))];
                 sistemas.forEach(sis => {
@@ -307,13 +295,15 @@
                     option.textContent = sis;
                     sistemaSelect.appendChild(option);
                 });
-
+        
                 updatePlantelOptions();
                 updateDashboard();
-            };
-            
-            reader.readAsArrayBuffer(file);
+            } catch (error) {
+                alert("Error al cargar datos: " + error.message);
+            }
         }
+        
+        window.onload = cargarExcelEmbebido;
 
         function updatePlantelOptions() {
             const sistemaSelect = document.getElementById('sistemaSelect');
@@ -775,4 +765,3 @@ const configPie = {
     </script>
 </body>
 </html>
-
