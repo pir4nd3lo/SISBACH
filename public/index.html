@@ -51,14 +51,13 @@
             margin-top: 30px;
         }
         .icne-stats {
-            display: flex;
+            display: Flex;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             justify-items: center;
             max-width: 1200px;
             margin: 0 auto;
             gap: 1.5rem;
             padding: 1rem;
-            flex-wrap: wrap;
         }
         .stat-box {
             text-align: center;
@@ -145,9 +144,10 @@
 </head>
 <body>
     <div class="container">
-        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px; background-color: #61828d; padding: 20px; border-radius: 10px;">
+        <!-- Encabezado -->
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px; background-color: #61828d;">
             <img src="https://www.ujat.mx/Content/images/escudo.png" alt="Logo" style="height: 80px; margin-right: 20px;">
-            <div style="text-align: center; color: white;">
+            <div style="text-align: center;">
                 <h1 style="margin: 0;">Resultados del Proceso de Admisión</h1>
                 <h1 style="margin: 0;">Licenciatura y TSU</h1>
                 <h1 style="margin: 0;">Dashboard</h1>
@@ -155,7 +155,7 @@
         </div>
 
         <div id="loadingMessage" class="loading">
-            Cargando datos del archivo Excel...
+            Cargando datos...
         </div>
 
         <div id="errorMessage" class="error" style="display: none;">
@@ -165,6 +165,7 @@
         </div>
 
         <div id="mainContent" style="display: none;">
+            <!-- Filtros -->
             <div class="filters">
                 <select id="sistemaSelect" onchange="updatePlantelOptions(); updateDashboard()" disabled>
                     <option value="TODOS">Todos los Sistemas</option>
@@ -174,6 +175,7 @@
                 </select>
             </div>
 
+            <!-- Estadísticas generales -->
             <div class="icne-stats">
                 <div class="stat-box">
                     <div class="stat-label">MÁXIMO DE ICNE</div>
@@ -208,7 +210,9 @@
                 </div>
             </div>
 
+            <!-- Gráficas -->
             <div class="grid-container">
+                <!-- Gráficas de habilidades -->
                 <div class="chart-container">
                     <div class="metric-header">Comprensión Lectora</div>
                     <canvas id="comprensionChart"></canvas>
@@ -235,15 +239,18 @@
                     </div>
                 </div>
                 
+                <!-- Gráfica de Top 10 Carreras ocupando toda la fila -->
                 <div class="chart-container" style="grid-column: 1 / 3;">
                     <div class="metric-header">Top 10 Carreras Más Solicitadas</div>
                     <canvas id="topCarrerasChart" class="vertical-chart"></canvas>
                 </div>
+                <!-- Gráfica de Carreras del Área de la Salud en la fila siguiente -->
                 <div class="chart-container" style="grid-column: 3 / -1;">
                     <div class="metric-header">Carreras del Área de la Salud</div>
                     <canvas id="carrerasSaludChart" class="vertical-chart"></canvas>
                 </div>
-            
+                
+                <!-- Nuevas gráficas de planteles -->
                 <div class="chart-container" style="grid-column: 1 / 4; display: none;" id="plantelesAceptadosContainer">
                     <div class="metric-header">Top 10 Planteles con Mayor Número de Aceptados</div>
                     <canvas id="topPlantelesAceptadosChart" class="vertical-chart"></canvas>
@@ -254,6 +261,7 @@
                 </div>
             </div>
         
+            <!-- Top 10 mejores puntajes ICNE -->
             <div class="chart-container" style="grid-column: 1 / -1;">
                 <div class="metric-header">Top 10 Mejores Puntajes ICNE</div>
                 <div class="table-responsive">
@@ -269,6 +277,7 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <!-- Los datos se llenarán dinámicamente -->
                         </tbody>
                     </table>
                 </div>
@@ -354,7 +363,7 @@
                 // Procesar datos
                 const headers = jsonData[0];
                 datos = jsonData.slice(1)
-                    .filter(row => row && row.length > 0) // Filtrar filas vacías
+                    .filter(row => row && row.length > 0)
                     .map(row => {
                         const obj = {};
                         headers.forEach((header, index) => {
@@ -369,13 +378,12 @@
 
                 console.log(`Datos finales procesados: ${datos.length} registros`);
 
-                // Habilitar controles y llenar opciones
-                document.getElementById('sistemaSelect').disabled = false;
-                document.getElementById('plantelSelect').disabled = false;
-
+                // Configurar selectores de filtros
                 const sistemaSelect = document.getElementById('sistemaSelect');
                 const plantelSelect = document.getElementById('plantelSelect');
-                
+                sistemaSelect.disabled = false;
+                plantelSelect.disabled = false;
+
                 // Limpiar opciones anteriores
                 sistemaSelect.querySelectorAll('option:not(:first-child)').forEach(option => option.remove());
                 plantelSelect.querySelectorAll('option:not(:first-child)').forEach(option => option.remove());
@@ -399,7 +407,6 @@
             }
         }
 
-        // El resto de las funciones permanecen igual...
         function updatePlantelOptions() {
             const sistemaSelect = document.getElementById('sistemaSelect');
             const plantelSelect = document.getElementById('plantelSelect');
@@ -436,7 +443,7 @@
             }
 
             const topData = [...filteredData]
-                .filter(item => item.ICNE && !isNaN(parseFloat(item.ICNE)))
+                .filter(item => item.ICNE)
                 .sort((a, b) => parseFloat(b.ICNE || 0) - parseFloat(a.ICNE || 0))
                 .slice(0, 10);
 
@@ -455,9 +462,6 @@
                 tableBody.appendChild(row);
             });
         }
-
-        // [Aquí van todas las demás funciones del JavaScript original sin cambios]
-        // updateDashboard, crearGraficaHabilidad, crearGraficasIngles, etc.
         
         function updateDashboard() {
             if (datos.length === 0) return;
@@ -483,7 +487,7 @@
             document.getElementById('porcentajeAceptacion').textContent = porcentajeAceptacion + '%';
 
             // Actualizar estadísticas ICNE
-            const icneValues = filteredData.map(item => parseFloat(item.ICNE) || 0).filter(val => val > 0);
+            const icneValues = filteredData.map(item => parseFloat(item.ICNE) || 0);
             const maxIcne = icneValues.length ? Math.max(...icneValues).toFixed(0) : '-';
             const minIcne = icneValues.length ? Math.min(...icneValues).toFixed(0) : '-';
             const avgIcne = icneValues.length ? (icneValues.reduce((a, b) => a + b, 0) / icneValues.length).toFixed(0) : '-';
@@ -498,10 +502,22 @@
             document.getElementById('plantelesAceptadosContainer').style.display = showPlantelCharts ? 'block' : 'none';
             document.getElementById('plantelesNoAceptadosContainer').style.display = showPlantelCharts ? 'block' : 'none';
 
+            // Mover la tabla de Top 10 ICNE al final
+            const topIcneContainer = document.querySelector('#topIcneTable').closest('.chart-container');
+            topIcneContainer.parentNode.appendChild(topIcneContainer);
+
+            // Destruir gráficas anteriores si están ocultas
+            Object.keys(charts).forEach(key => {
+                if (key !== 'topPlantelesAceptados' && key !== 'topPlantelesNoAceptados' && charts[key]) {
+                    charts[key].destroy();
+                    charts[key] = null;
+                }
+            });
+
             // Función para calcular promedios
             const promedio = (key) => {
-                const valores = filteredData.map(item => parseFloat(item[key]) || 0).filter(val => val > 0);
-                return valores.length ? (valores.reduce((sum, val) => sum + val, 0) / valores.length).toFixed(2) : 0;
+                const total = filteredData.reduce((sum, item) => sum + (parseFloat(item[key]) || 0), 0);
+                return filteredData.length ? (total / filteredData.length).toFixed(2) : 0;
             };
 
             // Configuración común para gráficas de habilidades
@@ -513,9 +529,13 @@
                     datalabels: {
                         anchor: 'center',
                         align: 'center',
-                        color: '#fff',
-                        font: { weight: 'bold', size: 14 },
-                        formatter: value => `${value}%`
+                        color: '#ffffff',
+                        font: { 
+                            weight: 'bold', 
+                            size: 14 
+                        },
+                        formatter: value => `${value}%`,
+                        offset: 10
                     }
                 },
                 scales: { x: { max: 100, beginAtZero: true } }
@@ -585,12 +605,7 @@
 
         // Función para crear gráficas de habilidades
         function crearGraficaHabilidad(canvasId, labels, keys, colores, promedio, commonOptions) {
-            const ctx = document.getElementById(canvasId);
-            if (charts[canvasId.replace('Chart', '')]) {
-                charts[canvasId.replace('Chart', '')].destroy();
-            }
-
-            return new Chart(ctx, {
+            return new Chart(document.getElementById(canvasId), {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -601,7 +616,26 @@
                         borderWidth: 1
                     }]
                 },
-                options: commonOptions,
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        ...commonOptions.plugins,
+                        legend: { 
+                            display: false
+                        },
+                        datalabels: {
+                            anchor: 'center',
+                            align: 'center',
+                            color: '#ffffff',
+                            font: {
+                                weight: 'bold',
+                                size: 14
+                            },
+                            formatter: value => `${value}%`,
+                            offset: 10
+                        }
+                    }
+                },
                 plugins: [ChartDataLabels]
             });
         }
@@ -623,14 +657,12 @@
                 };
             };
 
-            if (charts.suficienciaIngles) charts.suficienciaIngles.destroy();
             charts.suficienciaIngles = new Chart(document.getElementById('suficienciaInglesChart'), {
                 type: 'doughnut',
                 data: procesarIngles('DING_RI', ['#e74c3c', '#2ecc71']),
                 options: configPie
             });
 
-            if (charts.comprensionInglesDING) charts.comprensionInglesDING.destroy();
             charts.comprensionInglesDING = new Chart(document.getElementById('comprensionInglesDINGChart'), {
                 type: 'doughnut',
                 data: procesarIngles('DING_CL', ['#e74c3c', '#2ecc71']),
@@ -642,7 +674,6 @@
             const ctx = document.getElementById(chartId);
             const data = procesarCarreras(filteredData, filtroCarreras);
             
-            // Destruimos la gráfica previa si existe
             if (charts[chartId]) {
                 charts[chartId].destroy();
             }
