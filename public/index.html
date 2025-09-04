@@ -78,10 +78,14 @@
             font-size: 14px;
         }
         .chart-container {
-            padding: 20px;
+            padding: 15px;
             background-color: #ffffff;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            width: 100%;
+            height: auto;          /* 👈 evita altura fija */
+            min-height: 260px;     /* 👈 asegura espacio mínimo */
+            overflow-x: auto;      /* 👈 si se sale, permite scroll horizontal */
         }
         #fileInput {
             margin: 20px 0;
@@ -105,17 +109,19 @@
             padding-bottom: 8px;
         }
         .vertical-chart {
-            height: 400px !important;
+            height: 100% !important;  /* 👈 deja que el canvas se adapte */
+            min-height: 300px !important;
         }
         .table-responsive {
-            overflow-x: auto;   
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }       
 
         .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1rem;
+            font-size: 14px;
+            white-space: nowrap; /* 👈 evita que las celdas se rompan en varias líneas */
         }
+
         .table th, .table td {
             padding: 0.75rem;
             text-align: left;
@@ -152,15 +158,16 @@
 
                 
         @media (max-width: 768px) {
-            h1 { font-size: 20px; }
-            .container { padding: 10px; }
-            .stat-value { font-size: 18px; }
-            .stat-label { font-size: 12px; }
-            
+            .grid-container {
+            grid-template-columns: 1fr; /* 👈 todas las gráficas en una sola columna */
+             }
+            .chart-container {
+             min-height: 250px;
+            }
             #suficienciaInglesChart,
             #comprensionInglesDINGChart {
-                width: 220px !important;
-                height: 220px !important;
+            width: 180px !important;
+            height: 180px !important;
             }
         }
 
@@ -169,6 +176,11 @@
             .stat-value { font-size: 16px; }
             .stat-label { font-size: 11px; }
             .grid-container { grid-template-columns: 1fr; } /* 👈 todo en una columna */
+        }
+
+        canvas {
+            max-width: 100% !important;
+            height: auto !important;  /* 👈 escala automático */
         }
 
     </style>
