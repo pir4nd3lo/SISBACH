@@ -5,7 +5,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Método no permitido' });
     }
 
-    const excelUrl = "https://github.com/pir4nd3lo/SISBACH/raw/main/TABLA_C_LAGRGO.xlsx";
+    const excelUrl = "https://github.com/pir4nd3lo/SISBACH/raw/main/202601_admision.xlsx";
 
     try {
         console.log('Intentando obtener archivo desde:', excelUrl);
