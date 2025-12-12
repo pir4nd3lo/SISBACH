@@ -948,42 +948,45 @@
                             bottom: 10
                         }
                     },
-                    scales: { 
+                scales: { 
                         x: { 
                             stacked: false,
                             beginAtZero: true,
                             ticks: {
-                                maxTicksLimit: 8
+                                maxTicksLimit: 8,
+                                font: {
+                                size: 11
+                                        },
                             }
                         }, 
                         y: { 
-    stacked: false,
-    ticks: {
-        autoSkip: false,
-        maxTicksLimit: 10,
-        font: {
-            size: 08
-        },
-        callback: function(value) {
-            const label = this.getLabelForValue(value);
-            const maxChars = 25; // Máximo de caracteres por línea
+                            stacked: false,
+                            ticks: {
+                            autoSkip: false,
+                            maxTicksLimit: 10,
+                            font: {
+                            size: 11
+                            },
+                        callback: function(value) {
+                        const label = this.getLabelForValue(value);
+                        const maxChars = 25; // Máximo de caracteres por línea
             
-            if (label.length <= maxChars) {
-                return label;
-            }
+                        if (label.length <= maxChars) {
+                        return label;
+                        }
             
-            // Dividir en palabras
-            const words = label.split(' ');
-            const lines = [];
-            let currentLine = '';
+                        // Dividir en palabras
+                        const words = label.split(' ');
+                        const lines = [];
+                        let currentLine = '';
             
-            words.forEach(word => {
-                if ((currentLine + ' ' + word).trim().length > maxChars) {
-                    if (currentLine) lines.push(currentLine.trim());
-                    currentLine = word;
-                } else {
-                    currentLine = currentLine ? currentLine + ' ' + word : word;
-                }
+                        words.forEach(word => {
+                        if ((currentLine + ' ' + word).trim().length > maxChars) {
+                        if (currentLine) lines.push(currentLine.trim());
+                        currentLine = word;
+                        } else {
+                            currentLine = currentLine ? currentLine + ' ' + word : word;
+                        }
             });
             
             if (currentLine) lines.push(currentLine.trim());
